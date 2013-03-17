@@ -24,45 +24,35 @@
 			y: 0,
 			autoReset: true,
 
+			trigger: function(evtName) {
+				var $el = $(document.elementFromPoint(this.x, this.y));
+				$el.trigger(new $.Event(evtName, {
+					pageX: this.x,
+					pageY: this.y,
+					originalEvent: {
+						touches: [
+							{
+								pageX: this.x,
+								pageY: this.y
+							}
+						]
+					}
+				}));
+			},
+
 			tapStart: function() {
 				if (this.autoReset) {
 					this.x = this.y = 0;
 				}
-
-				var $el = $(document.elementFromPoint(this.x, this.y));
-				$el.trigger(new $.Event(startEvent, {
-					pageX: this.x,
-					pageY: this.y,
-					originalEvent: {
-						touches: [
-							{
-								pageX: this.x,
-								pageY: this.y
-							}
-						]
-					}
-				}));
+				this.trigger(startEvent);
 			},
 
 			tapEnd: function() {
-				var $el = $(document.elementFromPoint(this.x, this.y));
-				$el.trigger(stopEvent);
+				this.trigger(stopEvent);
 			},
 
 			click: function() {
-				var $el = $(document.elementFromPoint(this.x, this.y));
-				$el.trigger(new $.Event('click', {
-					pageX: this.x,
-					pageY: this.y,
-					originalEvent: {
-						touches: [
-							{
-								pageX: this.x,
-								pageY: this.y
-							}
-						]
-					}
-				}));
+				this.trigger('click');
 			},
 
 			move: function(x, y, duration, callback) {
@@ -84,19 +74,7 @@
 					self.x = Math.ceil(t / duration * x) + sx;
 					self.y = Math.ceil(t / duration * y) + sy;
 
-					var $el = $(document.elementFromPoint(self.x, self.y));
-					$el.trigger($.Event(moveEvent, {
-						pageX: self.x,
-						pageY: self.y,
-						originalEvent: {
-							touches: [
-								{
-									pageX: self.x,
-									pageY: self.y
-								}
-							]
-						}
-					}));
+					self.trigger(moveEvent);
 					timer = setTimeout(mv, 0);
 				})();
 			},
