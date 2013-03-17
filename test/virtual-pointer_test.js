@@ -1,4 +1,4 @@
-/*global Mocha, describe, xdescribe, beforeEach, afterEach, it, xit, sinon*/
+/*global Mocha, VirtualPointer, describe, xdescribe, before, beforeEach, afterEach, it, xit, sinon*/
 
 (function($) {
 
