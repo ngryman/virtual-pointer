@@ -76,6 +76,24 @@
 			});
 		});
 
+		describe('click', function() {
+			it('should work with direct events', function() {
+				var handler = sinon.spy();
+				$('body').on('click', handler);
+				this.pointer.click();
+				handler.should.have.been.calledOnce;
+				handler.should.have.been.calledOn(document.body);
+			});
+
+			it('should work with delegated events', function() {
+				var handler = sinon.spy();
+				$('html').on('click', 'body', handler);
+				this.pointer.click();
+				handler.should.have.been.calledOnce;
+				handler.should.have.been.calledOn(document.body);
+			});
+		});
+
 		describe('tap', function() {
 			it('should work with direct events', function() {
 				var handler = sinon.spy();

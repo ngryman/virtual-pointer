@@ -49,6 +49,22 @@
 				$el.trigger(stopEvent);
 			},
 
+			click: function() {
+				var $el = $(document.elementFromPoint(this.x, this.y));
+				$el.trigger(new $.Event('click', {
+					pageX: this.x,
+					pageY: this.y,
+					originalEvent: {
+						touches: [
+							{
+								pageX: this.x,
+								pageY: this.y
+							}
+						]
+					}
+				}));
+			},
+
 			move: function(x, y, duration, callback) {
 				var self = this, last = Date.now(), t = 0, timer;
 
