@@ -1,4 +1,4 @@
-/*! virtual-pointer - v0.0.1 - 2013-03-16
+/*! virtual-pointer - v0.0.1 - 2013-06-26
 * https://github.com/ngryman/virtual-pointer
 * Copyright (c) 2013 Nicolas Gryman; Licensed MIT */
 
@@ -22,19 +22,15 @@
 		};
 	});
 
-	window.VirtualPointer = function(scope) {
+	window.VirtualPointer = function(scope, targetElement) {
 		return {
 			x: 0,
 			y: 0,
 			autoReset: true,
 
-			tapStart: function() {
-				if (this.autoReset) {
-					this.x = this.y = 0;
-				}
-
-				var $el = $(document.elementFromPoint(this.x, this.y));
-				$el.trigger(new $.Event(startEvent, {
+			trigger: function(evtName) {
+				var $el = targetElement || $(document.elementFromPoint(this.x, this.y));
+				$el.trigger(new $.Event(evtName, {
 					pageX: this.x,
 					pageY: this.y,
 					originalEvent: {
@@ -48,9 +44,19 @@
 				}));
 			},
 
+			tapStart: function() {
+				if (this.autoReset) {
+					this.x = this.y = 0;
+				}
+				this.trigger(startEvent);
+			},
+
 			tapEnd: function() {
-				var $el = $(document.elementFromPoint(this.x, this.y));
-				$el.trigger(stopEvent);
+				this.trigger(stopEvent);
+			},
+
+			click: function() {
+				this.trigger('click');
 			},
 
 			move: function(x, y, duration, callback) {
@@ -72,19 +78,7 @@
 					self.x = Math.ceil(t / duration * x) + sx;
 					self.y = Math.ceil(t / duration * y) + sy;
 
-					var $el = $(document.elementFromPoint(self.x, self.y));
-					$el.trigger($.Event(moveEvent, {
-						pageX: self.x,
-						pageY: self.y,
-						originalEvent: {
-							touches: [
-								{
-									pageX: self.x,
-									pageY: self.y
-								}
-							]
-						}
-					}));
+					self.trigger(moveEvent);
 					timer = setTimeout(mv, 0);
 				})();
 			},

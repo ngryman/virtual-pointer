@@ -18,14 +18,14 @@
 		};
 	});
 
-	window.VirtualPointer = function(scope) {
+	window.VirtualPointer = function(scope, targetElement) {
 		return {
 			x: 0,
 			y: 0,
 			autoReset: true,
 
 			trigger: function(evtName) {
-				var $el = $(document.elementFromPoint(this.x, this.y));
+				var $el = targetElement || $(document.elementFromPoint(this.x, this.y));
 				$el.trigger(new $.Event(evtName, {
 					pageX: this.x,
 					pageY: this.y,
