@@ -67,7 +67,7 @@
 				(function mv() {
 					var now = Date.now();
 					t += now - last;
-					if (t >= duration) {
+					if (t > duration) {
 						callback.call(scope);
 						if( callTapEnd ){
 							self.tapEnd();
@@ -80,7 +80,7 @@
 					self.y = Math.ceil(t / duration * y) + sy;
 
 					self.trigger(moveEvent);
-					timer = setTimeout(mv, 0);
+					mv();
 				})();
 			},
 
