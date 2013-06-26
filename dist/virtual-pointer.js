@@ -1,4 +1,4 @@
-/*! virtual-pointer - v0.0.1 - 2013-03-16
+/*! virtual-pointer - v0.0.1 - 2013-06-26
 * https://github.com/ngryman/virtual-pointer
 * Copyright (c) 2013 Nicolas Gryman; Licensed MIT */
 
@@ -28,13 +28,9 @@
 			y: 0,
 			autoReset: true,
 
-			tapStart: function() {
-				if (this.autoReset) {
-					this.x = this.y = 0;
-				}
-
+			trigger: function(evtName) {
 				var $el = $(document.elementFromPoint(this.x, this.y));
-				$el.trigger(new $.Event(startEvent, {
+				$el.trigger(new $.Event(evtName, {
 					pageX: this.x,
 					pageY: this.y,
 					originalEvent: {
@@ -48,23 +44,34 @@
 				}));
 			},
 
-			tapEnd: function() {
-				var $el = $(document.elementFromPoint(this.x, this.y));
-				$el.trigger(stopEvent);
+			tapStart: function() {
+				if (this.autoReset) {
+					this.x = this.y = 0;
+				}
+				this.trigger(startEvent);
 			},
 
-			move: function(x, y, duration, callback) {
+			tapEnd: function() {
+				this.trigger(stopEvent);
+			},
+
+			click: function() {
+				this.trigger('click');
+			},
+
+			move: function(x, y, duration, callback, callTapEnd) {
 				var self = this, last = Date.now(), t = 0, timer;
 
-				this.tapStart();
 
 				var sx = this.x, sy = this.y;
 				(function mv() {
 					var now = Date.now();
 					t += now - last;
 					if (t >= duration) {
-						self.tapEnd();
 						callback.call(scope);
+						if( callTapEnd ){
+							self.tapEnd();
+						}
 						return;
 					}
 					last = now;
@@ -72,19 +79,7 @@
 					self.x = Math.ceil(t / duration * x) + sx;
 					self.y = Math.ceil(t / duration * y) + sy;
 
-					var $el = $(document.elementFromPoint(self.x, self.y));
-					$el.trigger($.Event(moveEvent, {
-						pageX: self.x,
-						pageY: self.y,
-						originalEvent: {
-							touches: [
-								{
-									pageX: self.x,
-									pageY: self.y
-								}
-							]
-						}
-					}));
+					self.trigger(moveEvent);
 					timer = setTimeout(mv, 0);
 				})();
 			},
@@ -115,8 +110,10 @@
 			},
 
 			drag: function(x, y, callback, duration) {
+				this.tapStart();
+
 				duration = duration || this.FLICK_DURATION * 1.5 /* security */;
-				this.move(x, y, duration, callback);
+				this.move(x, y, duration, callback, true);
 			},
 
 			flick: function(x, y, callback, duration) {

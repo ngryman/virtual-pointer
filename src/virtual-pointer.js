@@ -55,7 +55,7 @@
 				this.trigger('click');
 			},
 
-			move: function(x, y, duration, callback) {
+			move: function(x, y, duration, callback, callTapEnd) {
 				var self = this, last = Date.now(), t = 0, timer;
 
 
@@ -65,6 +65,9 @@
 					t += now - last;
 					if (t >= duration) {
 						callback.call(scope);
+						if( callTapEnd ){
+							self.tapEnd();
+						}
 						return;
 					}
 					last = now;
@@ -106,9 +109,7 @@
 				this.tapStart();
 
 				duration = duration || this.FLICK_DURATION * 1.5 /* security */;
-				this.move(x, y, duration, callback);
-
-				this.tapEnd();
+				this.move(x, y, duration, callback, true);
 			},
 
 			flick: function(x, y, callback, duration) {
