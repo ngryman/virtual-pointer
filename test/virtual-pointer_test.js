@@ -24,7 +24,7 @@
 					var self = this;
 					return function() {
 						self.apply(scope, arguments);
-					}
+					};
 				};
 			}
 		});
@@ -114,7 +114,9 @@
 			it('should work with target element', function(done) {
 				var handler = sinon.spy();
 				$('.target').on(this.pointer.MOVE_EVENT, handler);
+				this.pointer.tapStart(); // this ensure target receive move event on touch devices
 				this.pointer.move($('.target'), 25, function() {
+					this.pointer.tapEnd();
 					handler.should.have.been.calledOnce;
 					handler.should.have.been.calledOn($('.target')[0]);
 					done();

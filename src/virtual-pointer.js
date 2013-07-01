@@ -82,8 +82,6 @@
 					y = pos.top;
 				}
 
-				this.tapStart();
-
 				var sx = this.x, sy = this.y;
 				(function mv() {
 					var now = Date.now();
@@ -94,7 +92,6 @@
 							this.y = sy + y;
 							this.trigger(moveEvent);
 						}
-						this.tapEnd();
 						callback && callback.call(scope);
 						return;
 					}
@@ -144,7 +141,11 @@
 				}
 
 				duration = duration || this.FLICK_DURATION * 1.5 /* security */;
-				this.move(x, y, duration, callback);
+				this.tapStart();
+				this.move(x, y, duration, function() {
+					this.tapEnd();
+					callback && callback();
+				}.bind(this));
 			},
 
 			flick: function(x, y, callback, duration) {
@@ -160,7 +161,11 @@
 				}
 
 				duration = duration || this.FLICK_DURATION * 0.5 /* security */;
-				this.move(x, y, duration, callback);
+				this.tapStart();
+				this.move(x, y, duration, function() {
+					this.tapEnd();
+					callback && callback();
+				}.bind(this));
 			},
 
 			START_EVENT: startEvent,
