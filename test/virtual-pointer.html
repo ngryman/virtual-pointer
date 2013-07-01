@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
 	<meta charset="utf-8">
@@ -9,11 +9,25 @@
 	<!-- test styles -->
 	<style>
 		html, body { margin: 0; height: 100%; }
+
+		.target {
+			position: absolute;
+			left: 10px;
+			top: 0;
+			width: 10px;
+			height: 10px;
+			/*background: red;*/
+		}
 	</style>
 </head>
 <body>
 <!-- Required for browser reporter -->
 <div id="mocha"></div>
+
+<!-- Fixtures -->
+<div id="fixtures">
+	<div class="target"></div>
+</div>
 
 <!-- jQuery. This can be overridden with a ?jquery=___ param -->
 <script src="../libs/jquery-loader.js"></script>
@@ -21,7 +35,10 @@
 <!-- mocha -->
 <script src="../libs/mocha/mocha.js"></script>
 <script>
-	mocha.setup('bdd');
+	mocha.setup({
+		ui: 'bdd',
+		ignoreLeaks: true
+	});
 </script>
 
 <!-- chaijs -->

@@ -3,7 +3,6 @@
 	"eqeqeq": false,
 	"immed": true,
 	"latedef": true,
-	"newcap": true,
 	"noarg": true,
 	"sub": true,
 	"undef": true,
@@ -12,7 +11,18 @@
 	"browser": true,
 	"expr": true,
 	"newcap": false,
+	"jquery": true,
 	"globals": {
-		"jQuery": true
+		"Mocha": true,
+		"sinon": true,
+		"VirtualPointer": true,
+		"describe": true,
+		"xdescribe": true,
+		"before": true,
+		"beforeEach": true,
+		"after": true,
+		"afterEach": true,
+		"it": true,
+		"xit": true
 	}
 }

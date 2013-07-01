@@ -18,14 +18,14 @@
 		};
 	});
 
-	window.VirtualPointer = function(scope, targetElement) {
+	window.VirtualPointer = function(scope) {
 		return {
 			x: 0,
 			y: 0,
 			autoReset: true,
 
 			trigger: function(evtName) {
-				var $el = targetElement || $(document.elementFromPoint(this.x, this.y));
+				var $el = $(document.elementFromPoint(this.x, this.y));
 				$el.trigger(new $.Event(evtName, {
 					pageX: this.x,
 					pageY: this.y,
@@ -40,23 +40,47 @@
 				}));
 			},
 
-			tapStart: function() {
+			tapStart: function(target) {
 				if (this.autoReset) {
 					this.x = this.y = 0;
+				}
+				if (target) {
+					var pos = $(target).offset();
+					this.x = pos.left;
+					this.y = pos.top;
 				}
 				this.trigger(startEvent);
 			},
 
-			tapEnd: function() {
+			tapEnd: function(target) {
+				if (target) {
+					var pos = $(target).offset();
+					this.x = pos.left;
+					this.y = pos.top;
+				}
 				this.trigger(stopEvent);
 			},
 
-			click: function() {
+			click: function(target) {
+				if (target) {
+					var pos = $(target).offset();
+					this.x = pos.left;
+					this.y = pos.top;
+				}
 				this.trigger('click');
 			},
 
 			move: function(x, y, duration, callback) {
-				var self = this, last = Date.now(), t = 0, timer;
+				var last = Date.now(), t = 0, timer, pos;
+
+				// juggling
+				if ('number' != typeof x) {
+					callback = duration;
+					duration = y;
+					pos = $(x).offset();
+					x = pos.left;
+					y = pos.top;
+				}
 
 				this.tapStart();
 
@@ -64,52 +88,77 @@
 				(function mv() {
 					var now = Date.now();
 					t += now - last;
-					if (t >= duration) {
-						self.tapEnd();
-						callback.call(scope);
+					if (t > duration) {
+						if (x != this.x || y != this.y) {
+							this.x = sx + x;
+							this.y = sy + y;
+							this.trigger(moveEvent);
+						}
+						this.tapEnd();
+						callback && callback.call(scope);
 						return;
 					}
 					last = now;
 
-					self.x = Math.ceil(t / duration * x) + sx;
-					self.y = Math.ceil(t / duration * y) + sy;
+					this.x = Math.ceil(t / duration * x) + sx;
+					this.y = Math.ceil(t / duration * y) + sy;
 
-					self.trigger(moveEvent);
-					timer = setTimeout(mv, 0);
-				})();
+					this.trigger(moveEvent);
+					timer = setTimeout(mv.bind(this), 0);
+				}.bind(this))();
 			},
 
-			tap: function() {
-				this.tapStart();
-				this.tapEnd();
+			tap: function(target) {
+				this.tapStart(target);
+				this.tapEnd(target);
 			},
 
-			press: function(callback, duration) {
-				var self = this;
+			press: function(callback, duration, target) {
 				duration = duration || this.PRESS_DURATION * 1.5 /* security */;
-				this.tapStart();
+				this.tapStart(target);
 				setTimeout(function() {
-					self.tapEnd();
-					if (callback) callback.call(scope);
-				}, duration);
+					this.tapEnd(target);
+					callback && callback.call(scope);
+				}.bind(this), duration);
 			},
 
-			doubleTap: function(callback, duration) {
-				var self = this;
+			doubleTap: function(callback, duration, target) {
 				duration = duration || this.DOUBLETAP_DURATION * 0.5 /* security */;
-				this.tap();
+				this.tap(target);
 				setTimeout(function() {
-					self.tap();
-					callback.call(scope);
-				}, duration);
+					this.tap(target);
+					callback && callback.call(scope);
+				}.bind(this), duration);
 			},
 
 			drag: function(x, y, callback, duration) {
+				var pos;
+
+				// juggling
+				if ('number' != typeof x) {
+					duration = callback;
+					callback = y;
+					pos = $(x).offset();
+					x = pos.left;
+					y = pos.top;
+				}
+
 				duration = duration || this.FLICK_DURATION * 1.5 /* security */;
 				this.move(x, y, duration, callback);
 			},
 
 			flick: function(x, y, callback, duration) {
+				var pos;
+
+				// juggling
+				if ('number' != typeof x) {
+					duration = callback;
+					callback = y;
+					pos = $(x).offset();
+					x = pos.left;
+					y = pos.top;
+				}
+
 				duration = duration || this.FLICK_DURATION * 0.5 /* security */;
 				this.move(x, y, duration, callback);
 			},

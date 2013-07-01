@@ -42,7 +42,7 @@ module.exports = function(grunt) {
 				src: ['test/**/*.html'],
 				options: {
 					mocha: {
-						ignoreLeaks: false
+						ignoreLeaks: true
 					},
 					run: true
 				}
