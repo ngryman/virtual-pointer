@@ -17,6 +17,16 @@
 			window.scrollTo = $.noop;
 			// prevent user from scrolling
 			$('body').css('overflow', 'hidden');
+
+			// XXX: phantomjs does not implement Function#bind: https://github.com/ariya/phantomjs/issues/10522
+			if (window.PHANTOMJS) {
+				Function.prototype.bind = function(scope) {
+					var self = this;
+					return function() {
+						self.apply(scope, arguments);
+					}
+				};
+			}
 		});
 
 		after(function() {
